@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JW-Assure</title>
+  <meta name="apple-mobile-web-app-title" content="JW-Assure">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png?v=4">
+  <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png?v=4">
+  <meta name="theme-color" content="#0d47a1">
+  <style>
+    :root{
+      --bg: #0e2024; --card:#0f1a30; --text:#e8eeff; --muted:#9db2d7;
+      --primary:#2c92a7; --accent:#f3c623; --divider:#1e2a45; --shadow:0 6px 16px rgba(0,0,0,.35);
+      --chip:#172540; --chip-text:#cfe0ff; --bar-bg:#24354f; --blue:#2c92a7; --gray:#2a3b56;
+    }
+    [data-theme="light"]{
+      --bg:#f5f7fb; --card:#ffffff; --text:#0c254a; --muted:#6b7b93; --divider:#e4e9f2;
+      --chip:#eef3ff; --chip-text:#0d47a1; --bar-bg:#e8eef9; --blue:#0d47a1; --gray:#c9d5e8;
+      --accent:#f6b80a; --primary:#0d77a8;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial}
+    header{background: linear-gradient(180deg, var(--blue), #123a86 80%); color:#fff; padding:14px 18px 18px; position:sticky; top:0; z-index:10; box-shadow: var(--shadow);}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:34px;height:34px;border-radius:8px;background:#fff;color:#123a86; display:grid;place-items:center;font-weight:800}
+    .subtitle{opacity:.85;font-size:.92rem;margin-top:2px}
+    nav.tabs{display:flex;gap:8px;margin-top:12px}
+    .tab-btn{flex:1;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color:#fff; font-weight:600;cursor:pointer}
+    .tab-btn.active{background:#fff;color:var(--blue);}
+    main{padding:18px;max-width:980px;margin:0 auto}
+    .card{background:var(--card);border:1px solid var(--divider);border-radius:18px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+    h1{font-size:1.5rem;margin:0 0 6px}
+    h2{margin:0 0 6px}
+    .muted{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px}
+    .ring-wrap{display:grid;place-items:center;padding:18px}
+    .ring-legend{display:flex;gap:14px;justify-content:center;margin-top:8px}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .legend-item{display:flex;align-items:center;gap:8px}
+    .balance{font-size:2rem;font-weight:900;text-align:center}
+    .center-text{font-weight:700;margin-top:6px;text-align:center}
+    .bar-wrap{background:var(--bar-bg);border-radius:12px;padding:8px}
+    .bar{height:16px;background:linear-gradient(90deg,var(--gray),var(--blue));border-radius:8px;width:0%;transition:width .5s}
+    .segments{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:6px}
+    .seg{height:12px;border-radius:3px;background:var(--gray);opacity:.5}
+    .seg.filled{background:var(--blue);opacity:1}
+    footer{padding:26px 12px;text-align:center;color:var(--muted)}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:var(--card);color:var(--text);border:1px solid var(--divider);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);display:none}
+    .search{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+    .btn{background:var(--blue);color:#fff;border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;color:var(--blue);border:1px solid var(--blue)}
+    input[type="number"], input[type="text"], input[type="date"], input[type="search"]{width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--text);border:1px solid var(--divider)}
+    .row{display:flex;gap:12px}.row>*{flex:1}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">JW</div>
+      <div>
+        <div style="font-weight:900;letter-spacing:.2px">JW-Assure</div>
+        <div class="subtitle">Private Vorsorge</div>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="home">Home</button>
+      <button class="tab-btn" data-tab="history">Verlauf</button>
+      <button class="tab-btn" data-tab="insurance">Versicherungen</button>
+      <button class="tab-btn" data-tab="settings">Einstellungen</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="card">
+      <h1>Guten Tag Joel Weber!</h1>
+      <div class="muted" id="subtitle"></div>
+      <div class="ring-wrap">
+        <svg id="dualRing" width="320" height="320" viewBox="0 0 120 120" aria-label="Fortschritt">
+          <circle cx="60" cy="60" r="54" stroke="rgba(255,255,255,.12)" stroke-width="6" fill="none"/>
+          <circle cx="60" cy="60" r="42" stroke="rgba(255,255,255,.12)" stroke-width="6" fill="none"/>
+          <circle id="ring-main" cx="60" cy="60" r="54" stroke="var(--primary)" stroke-width="6" fill="none"
+                  stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="0 400"/>
+          <circle id="ring-s3a" cx="60" cy="60" r="42" stroke="var(--accent)" stroke-width="6" fill="none"
+                  stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="0 400"/>
+        </svg>
+        <div class="balance" id="balanceText">CHF 0</div>
+        <div class="center-text muted">Kontostand</div>
+        <div class="center-text" id="s3aInline">Säule 3a: CHF 0</div>
+        <div class="ring-legend">
+          <div class="legend-item"><span class="dot" style="background:var(--primary)"></span><span>Versicherung</span></div>
+          <div class="legend-item"><span class="dot" style="background:var(--accent)"></span><span>Säule 3a</span></div>
+        </div>
+        <div style="text-align:center; margin-top:12px;">
+          <button id="openDeposit" class="btn" style="min-width:180px;">Einzahlung</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VERLAUF -->
+    <section id="history" class="card" style="display:none">
+      <h2>Verlauf</h2>
+      <div class="search">
+        <input id="searchInput" type="search" placeholder="Suchen nach Notiz, Datum (JJJJ-MM-TT) ...">
+        <button class="btn ghost" id="clearSearch">Löschen</button>
+      </div>
+      <div id="historyList" class="list"></div>
+    </section>
+
+    <!-- VERSICHERUNGEN -->
+    <section id="insurance" class="card" style="display:none">
+      <h2>Leistungen</h2>
+      <div style="margin-top:12px">
+        <div style="font-weight:800;margin-bottom:6px">Arbeitslosenversicherung</div>
+        <div class="segments" id="alvSegs"></div>
+        <div class="muted" style="margin-top:6px">Gedeckte Monate: <span id="alvMonths">0</span></div>
+      </div>
+      <div style="margin-top:18px">
+        <div style="font-weight:800;margin-bottom:6px">FlexiGuard Versicherung</div>
+        <div class="bar-wrap"><div id="flexBar" class="bar"></div></div>
+        <div class="muted" style="margin-top:6px">Summe: <span id="flexSum">CHF 0</span></div>
+      </div>
+      <div style="margin-top:18px">
+        <div style="font-weight:800;margin-bottom:6px">Säule 3a</div>
+        <div class="segments" id="s3aSegs"></div>
+        <div class="muted" style="margin-top:6px">Eingezahlt: <span id="s3aTotal">CHF 0</span> / 10’000</div>
+      </div>
+    </section>
+
+    <!-- EINZAHLUNG -->
+    <section id="deposit" class="card" style="display:none">
+      <h2>Einzahlung</h2>
+      <p class="muted">Gib deine Bemessungsgrundlage ein – wir berechnen automatisch <strong>18%</strong> als definitive Einzahlungssumme.</p>
+      <div class="row" style="align-items:center">
+        <label style="margin:0;min-width:190px">Bemessungsgrundlage (CHF)</label>
+        <input id="depBase" type="number" step="0.05" placeholder="z.&nbsp;B. 5'000" style="min-width:180px;flex:2">
+        <button id="depClear" class="btn ghost">Zurücksetzen</button>
+      </div>
+      <div style="margin-top:10px">Definitive Einzahlungssumme (18%): <strong id="depResult">CHF 0.00</strong></div>
+
+      <div style="margin-top:16px">
+        <div style="font-weight:800;margin-bottom:6px">Hinterlegte Unterlagen</div>
+        <div id="depDocBox" style="display:none"></div>
+        <div id="depDocEmpty" class="muted">Noch keine Datei hinterlegt.</div>
+      </div>
+
+      
+    </section>
+
+    <!-- EINSTELLUNGEN HUB + SUBPAGES -->
+    <section id="settings" class="card" style="display:none">
+      <h2>Einstellungen</h2>
+      <div class="grid" style="margin-top:8px">
+        <button class="btn" id="openSettingsView">Ansicht</button>
+        <button class="btn" id="openSettingsMoney">Eintrag &amp; Kontostand</button>
+        <button class="btn" id="openSettingsDeposit">Einzahlungen</button>
+        <button class="btn" id="openSettingsData">Meine JW-Assure Daten</button>
+      </div>
+    </section>
+
+    <section id="settingsView" class="card" style="display:none">
+      <div class="row" style="align-items:center; margin-bottom:8px"><button class="btn ghost" id="backSettings">⟵ Einstellungen</button></div>
+      <h2>Ansicht</h2>
+      <div class="row" style="align-items:center;margin-top:6px">
+        <input id="darkToggle" type="checkbox" />
+        <label for="darkToggle" style="margin:0;font-weight:600">Dark Mode</label>
+      </div>
+      <div class="right" style="margin-top:14px"><button id="saveView" class="btn">Ansicht speichern</button></div>
+    </section>
+
+    <section id="settingsMoney" class="card" style="display:none">
+      <div class="row" style="align-items:center; margin-bottom:8px"><button class="btn ghost" id="backSettings2">⟵ Einstellungen</button></div>
+      <h2>Eintrag &amp; Kontostand</h2>
+      <div class="grid">
+        <div><label for="balanceInput">Kontostand (CHF)</label><input id="balanceInput" type="number" step="0.05" /></div>
+      </div>
+      <div class="section-title" style="font-weight:900;margin-top:12px">Eintrag hinzufügen</div>
+      <div class="row">
+        <div><label>Betrag (CHF, + Einnahme / − Ausgabe)</label><input id="amountInput" type="number" step="0.05" placeholder="z.B. 50 oder -12.90"></div>
+        <div><label>Datum</label><input id="dateInput" type="date"></div>
+      </div>
+      <label>Notiz</label><input id="noteInput" type="text" placeholder="optional">
+      <div class="right" style="margin-top:14px"><button id="createEntry" class="btn">Eintrag speichern</button></div>
+      <div class="section-title" style="font-weight:900;margin-top:12px">Säule 3a</div>
+      <div class="row">
+        <div><label>Aktueller Stand (CHF)</label><input id="s3aInput" type="number" step="0.05" placeholder="Summe Säule 3a"></div>
+        <div><label>Beitrag hinzufügen (CHF)</label><input id="s3aAdd" type="number" step="0.05" placeholder="z.B. 100"></div>
+      </div>
+      <div class="right" style="margin-top:8px">
+        <button id="s3aSave" class="btn">Säule 3a speichern</button>
+        <button id="s3aAddBtn" class="btn ghost">Beitrag hinzufügen</button>
+      </div>
+      <div class="right" style="margin-top:14px"><button id="saveMoney" class="btn">Speichern</button></div>
+    </section>
+
+    <section id="settingsDeposit" class="card" style="display:none">
+      <div class="row" style="align-items:center; margin-bottom:8px"><button class="btn ghost" id="backSettings3">⟵ Einstellungen</button></div>
+      <h2>Einzahlungen</h2>
+      <div class="section-title" style="font-weight:900;margin-top:12px">Einzahlungs-Dokument</div>
+      <div class="row">
+        <label class="btn ghost" style="display:inline-block;text-align:center;cursor:pointer">
+          Datei hochladen (PNG/JPEG/PDF)
+          <input id="depUpload" type="file" accept="image/png,image/jpeg,application/pdf" style="display:none">
+        </label>
+        <button id="depRemove" class="btn">Entfernen</button>
+      </div>
+    </section>
+
+    <section id="settingsData" class="card" style="display:none">
+      <div class="row" style="align-items:center; margin-bottom:8px"><button class="btn ghost" id="backSettings4">⟵ Einstellungen</button></div>
+      <h2>Meine JW-Assure Daten</h2>
+      <div class="section-title" style="font-weight:900;margin-top:12px">Daten exportieren / importieren</div>
+      <div class="row">
+        <button id="exportBtn" class="btn">Export (.json)</button>
+        <label class="btn ghost" style="display:inline-block;text-align:center;cursor:pointer">
+          Import (.json)
+          <input id="importInput" type="file" accept="application/json" style="display:none">
+        </label>
+      </div>
+      <div class="right" style="margin-top:14px"><button id="resetAll" class="btn ghost">Alles zurücksetzen</button></div>
+    </section>
+  </main>
+
+  <footer>© 2025 JW-Assure</footer>
+  <div id="toast" class="toast">Aktion ausgeführt</div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+    const fmt = n => new Intl.NumberFormat('de-CH',{style:'currency',currency:'CHF'}).format(n||0);
+    const todayISO = () => new Date().toISOString().slice(0,10);
+    const round2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
+
+    const state = { balance:0, entries:[], dark:true, startDate:null, s3a:0, depDoc:null };
+
+    function load(){
+      const data = JSON.parse(localStorage.getItem('jwAssure')||'{}');
+      Object.assign(state, data);
+      if(!state.startDate){ const d=new Date(); d.setDate(1); state.startDate=d.toISOString().slice(0,10); save(); }
+      document.documentElement.setAttribute('data-theme', state.dark?'dark':'light');
+    }
+    function save(){ localStorage.setItem('jwAssure', JSON.stringify(state)); }
+    function monthsSinceStart(){ const s=new Date(state.startDate), n=new Date(); return (n.getFullYear()-s.getFullYear())*12 + (n.getMonth()-s.getMonth()) + 1; }
+    function dynamicGoal(){ return monthsSinceStart()*300; }
+
+    function renderHome(){
+      $('#balanceText').textContent = fmt(state.balance);
+      $('#s3aInline').textContent = 'Säule 3a: ' + fmt(state.s3a);
+
+      const ringMain = $('#ring-main'), ringS3a = $('#ring-s3a');
+      const C1 = 2*Math.PI*54, C2 = 2*Math.PI*42;
+      const goal = dynamicGoal();
+      const ratioMain = Math.max(0, Math.min(1, goal>0 ? state.balance/goal : 0));
+      const ratioS3a = Math.max(0, Math.min(1, state.s3a/10000));
+      ringMain.setAttribute('stroke-dasharray', (C1*ratioMain).toFixed(1)+' '+(C1*(1-ratioMain)).toFixed(1));
+      ringS3a.setAttribute('stroke-dasharray', (C2*ratioS3a).toFixed(1)+' '+(C2*(1-ratioS3a)).toFixed(1));
+
+      const m = new Date().toLocaleString('de-CH',{month:'long', year:'numeric'});
+      $('#subtitle').textContent = m;
+
+      // reflect inputs
+      $('#balanceInput') && ($('#balanceInput').value = state.balance);
+      $('#s3aInput') && ($('#s3aInput').value = state.s3a);
+      $('#dateInput') && ($('#dateInput').value = $('#dateInput').value || todayISO());
+      $('#darkToggle') && ($('#darkToggle').checked = !!state.dark);
+    }
+
+    function renderHistory(filter=''){
+      const list = $('#historyList'); if(!list) return; list.innerHTML='';
+      const groups = {};
+      state.entries.forEach(e => { const key=(e.date||'').slice(0,7); (groups[key]=groups[key]||[]).push(e); });
+      const keys = Object.keys(groups).sort().reverse();
+      if(keys.length===0){ list.innerHTML = '<p class="muted">Noch keine Einträge.</p>'; return; }
+      for(const key of keys){
+        const monthEntries = groups[key];
+        const label = new Date(key+'-01').toLocaleDateString('de-CH',{month:'long', year:'numeric'});
+        const elMonth = document.createElement('div'); elMonth.style.fontWeight='800'; elMonth.style.margin='10px 0 6px'; elMonth.textContent=label; list.appendChild(elMonth);
+        for(const e of monthEntries.sort((a,b)=>b.date.localeCompare(a.date))){
+          const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='12px'; row.style.borderBottom='1px dashed var(--divider)';
+          const left=document.createElement('div'); left.innerHTML=`<div style="font-weight:700">${e.note||'—'}</div><div class="muted">${new Date(e.date).toLocaleDateString('de-CH')}</div>`;
+          const right=document.createElement('div'); right.style.fontWeight='800'; right.style.color = e.amount>=0?'#2ecc71':'#e74c3c'; right.textContent=(e.amount>=0?'+ ':'')+fmt(e.amount);
+          row.appendChild(left); row.appendChild(right); list.appendChild(row);
+        }
+      }
+    }
+
+    function renderInsurance(){
+      const months = Math.max(0, state.balance/600);
+      $('#alvMonths').textContent = months.toFixed(1);
+      const segs = $('#alvSegs'); segs.innerHTML='';
+      for(let i=0;i<12;i++){ const d=document.createElement('div'); d.className='seg'; if(i<Math.min(12,Math.floor(months))) d.classList.add('filled'); if(i===Math.floor(months)&&months<12){ const p=months-Math.floor(months); if(p>0){ d.classList.add('filled'); d.style.opacity=Math.max(.3,p);} } segs.appendChild(d); }
+
+      const flex = state.balance * 0.25;
+      $('#flexSum').textContent = fmt(flex);
+      const pct = Math.max(0, Math.min(100, (flex/10000)*100));
+      $('#flexBar').style.width = pct + '%';
+
+      const s3aSegs = $('#s3aSegs'); s3aSegs.innerHTML='';
+      const filled = Math.min(10, Math.floor(state.s3a/1000)); const partial=(state.s3a%1000)/1000;
+      for(let i=0;i<10;i++){ const d=document.createElement('div'); d.className='seg'; d.style.background='var(--gray)'; if(i<filled){ d.classList.add('filled'); d.style.background='var(--accent)'; } if(i===filled && partial>0 && filled<10){ d.classList.add('filled'); d.style.background='var(--accent)'; d.style.opacity=Math.max(.35, partial);} s3aSegs.appendChild(d); }
+      $('#s3aTotal').textContent = fmt(state.s3a);
+    }
+
+    function renderDeposit(){
+      
+      let raw = ($('#depBase')?.value||'').toString().trim();
+      raw = raw.replace(/\s+/g,'').replace(/[’']/g,'').replace(',', '.');
+      const base = parseFloat(raw)||0;
+
+      const result = base * 0.18;
+      $('#depResult') && ($('#depResult').textContent = fmt(result));
+
+      const box = $('#depDocBox'); const empty = $('#depDocEmpty');
+      if(!box || !empty) return;
+      if(state.depDoc && state.depDoc.data){
+        empty.style.display='none'; box.style.display='block'; box.innerHTML='';
+        if(state.depDoc.type?.includes('pdf')){
+          const a = document.createElement('a'); a.href=state.depDoc.data; a.target='_blank'; a.textContent='PDF öffnen';
+          box.appendChild(a);
+        }else{
+          const img = document.createElement('img'); img.src=state.depDoc.data; img.style.maxWidth='260px'; img.style.borderRadius='8px';
+          box.appendChild(img);
+        }
+      }else{ box.style.display='none'; empty.style.display='block'; }
+    }
+
+    function switchTab(name){
+      $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===name));
+      ['home','history','insurance','settings','deposit','settingsView','settingsMoney','settingsDeposit','settingsData'].forEach(id => $('#'+id).style.display = (id===name)?'block':'none');
+    }
+
+    // Click handlers
+    document.addEventListener('click', (e)=>{
+      const tab = e.target.closest('.tab-btn'); if(tab){ switchTab(tab.dataset.tab); return; }
+      if(e.target.id==='openDeposit'){ switchTab('deposit'); renderDeposit(); }
+
+      if(e.target.id==='createEntry'){
+        const amount=parseFloat($('#amountInput').value); const date=$('#dateInput').value||todayISO(); const note=$('#noteInput').value.trim();
+        if(!amount && amount!==0){ alert('Bitte Betrag eingeben.'); return; }
+        state.entries.push({amount:round2(amount), date, note}); state.balance = round2((parseFloat(state.balance)||0)+amount);
+        save(); renderHome(); renderHistory($('#searchInput')?.value||''); renderInsurance(); switchTab('home'); const t=$('#toast'); t.textContent='Eintrag gespeichert'; t.style.display='block'; setTimeout(()=>t.style.display='none',1600);
+        $('#amountInput').value=''; $('#noteInput').value='';
+      }
+
+      if(e.target.id==='saveView'){
+        state.dark = $('#darkToggle').checked; document.documentElement.setAttribute('data-theme', state.dark?'dark':'light'); save();
+        const t=$('#toast'); t.textContent='Ansicht gespeichert'; t.style.display='block'; setTimeout(()=>t.style.display='none',1600);
+      }
+      if(e.target.id==='saveMoney'){
+        state.balance = round2(parseFloat($('#balanceInput').value)||0); save(); renderHome(); renderInsurance();
+        const t=$('#toast'); t.textContent='Gespeichert'; t.style.display='block'; setTimeout(()=>t.style.display='none',1600);
+      }
+      if(e.target.id==='s3aSave'){
+        state.s3a = round2(parseFloat($('#s3aInput').value)||0); save(); renderHome(); renderInsurance(); const t=$('#toast'); t.textContent='Säule 3a gespeichert'; t.style.display='block'; setTimeout(()=>t.style.display='none',1600);
+      }
+      if(e.target.id==='s3aAddBtn'){
+        const add=parseFloat($('#s3aAdd').value); if(!add && add!==0){ alert('Bitte Beitrag eingeben.'); return; }
+        state.s3a = round2((state.s3a||0)+add); $('#s3aInput').value=state.s3a; $('#s3aAdd').value=''; save(); renderHome(); renderInsurance(); const t=$('#toast'); t.textContent='Beitrag hinzugefügt'; t.style.display='block'; setTimeout(()=>t.style.display='none',1600);
+      }
+
+      // Settings navigation & back
+      if(e.target.id==='openSettingsView'){ switchTab('settingsView'); }
+      if(e.target.id==='openSettingsMoney'){ switchTab('settingsMoney'); }
+      if(e.target.id==='openSettingsDeposit'){ switchTab('settingsDeposit'); }
+      if(e.target.id==='openSettingsData'){ switchTab('settingsData'); }
+      if(e.target.id==='backSettings' || e.target.id==='backSettings2' || e.target.id==='backSettings3' || e.target.id==='backSettings4'){ switchTab('settings'); }
+
+      if(e.target.id==='resetAll'){
+        if(confirm('Alle Daten löschen?')){
+          state.balance=0; state.entries=[]; state.s3a=0; state.depDoc=null; const d=new Date(); d.setDate(1); state.startDate=d.toISOString().slice(0,10);
+          save(); renderHome(); renderHistory(); renderInsurance(); renderDeposit(); const t=$('#toast'); t.textContent='Zurückgesetzt'; t.style.display='block'; setTimeout(()=>t.style.display='none',1600);
+        }
+      }
+      if(e.target.id==='depRemove'){ state.depDoc=null; save(); renderDeposit(); }
+      if(e.target.id==='depClear'){ $('#depBase').value=''; renderDeposit(); }
+    });
+
+    // Other listeners
+    $('#searchInput')?.addEventListener('input', e => renderHistory(e.target.value.trim()));
+    $('#clearSearch')?.addEventListener('click', ()=>{ $('#searchInput').value=''; renderHistory(''); });
+
+    $('#exportBtn')?.addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob); const a = document.createElement('a');
+      const ts = new Date().toISOString().slice(0,10).replace(/-/g,'');
+      a.href=url; a.download=`jw-assure-backup-${ts}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+    
+    // Live calculation while typing on deposit input
+    $('#depBase')?.addEventListener('input', ()=> renderDeposit());
+
+    $('#importInput')?.addEventListener('change', async (e)=>{
+      const file = e.target.files?.[0]; if(!file) return;
+      try{ const text = await file.text(); const data=JSON.parse(text); if(!('balance' in data) || !('entries' in data)) throw new Error('Ungültiges Backup');
+        Object.assign(state, data); save(); renderHome(); renderHistory(); renderInsurance(); renderDeposit(); switchTab('home'); const t=$('#toast'); t.textContent='Import erfolgreich'; t.style.display='block'; setTimeout(()=>t.style.display='none',1600);
+      }catch(err){ alert('Import fehlgeschlagen: '+err.message); } finally{ e.target.value=''; }
+    });
+
+    // Upload for deposit doc
+    $('#depUpload')?.addEventListener('change', async (e)=>{
+      const file=e.target.files?.[0]; if(!file) return; const reader=new FileReader();
+      reader.onload=()=>{ state.depDoc={name:file.name,type:file.type,data:reader.result}; save(); renderDeposit(); };
+      reader.readAsDataURL(file); e.target.value='';
+    });
+
+    load(); renderHome(); renderHistory(); renderInsurance(); renderDeposit(); switchTab('home');
+  </script>
+</body>
+</html>
